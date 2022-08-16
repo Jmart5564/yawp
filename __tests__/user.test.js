@@ -35,6 +35,33 @@ describe('backend-express-template routes', () => {
     expect(res.status).toBe(200);
     expect(res.body.message).toEqual('Signed in successfully!');
   });
+  
+  it('should get list of users if user is admin', async () => {
+    const adminUser = {
+      firstName: 'Auth',
+      lastName: 'Official',
+      email: 'imanadmin@admin.com',
+      password: 'Authorized',
+    };
+    await agent.post('/api/v1/users').send(adminUser);
+    const res = await agent.get('/api/v1/users');
+    expect(res.status).toBe(200);
+    expect(res.body[0]).toEqual({
+      id: expect.any(String),
+      firstName: expect.any(String),
+      lastName: expect.any(String),
+      email: expect.any(String),
+    });
+  });
+  it('should give a 401 error if no user signed in tries to view list of users', async () => {
+    const res = await request(app).get('/api/v1/users');
+    expect(res.status).toBe(401);
+  });
+  it('should give a 403 error for unauthorized users viewing list of users', async () => {
+    await agent.post('/api/v1/users').send(testUser);
+    const res = await agent.get('/api/v1/users');
+    expect(res.status).toBe(403);
+  });
   afterAll(() => {
     pool.end();
   });
