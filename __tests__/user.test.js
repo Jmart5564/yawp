@@ -86,6 +86,24 @@ describe('backend-express-template routes', () => {
       reviews: expect.any(Array),
     });
   });
+
+  it('should add a new review if user is signed in', async () => {
+    const review = {
+      stars: 3,
+      description:
+        'If Every Pork Chop Were Perfect, We Wouldn/t Have Hot Dogs',
+    };
+    await agent.post('/api/v1/users').send(testUser);
+    await agent.post('/api/v1/users/sessions').send(testUser);
+    const res = await agent.post('/api/v1/restaurants/2/reviews').send(review);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: expect.any(String),
+      restaurantId: '2',
+      userId: expect.any(String),
+      ...review,
+    });
+  });
   afterAll(() => {
     pool.end();
   });
