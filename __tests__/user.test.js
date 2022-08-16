@@ -36,6 +36,15 @@ describe('backend-express-template routes', () => {
     expect(res.body.message).toEqual('Signed in successfully!');
   });
   
+  it('should give a 401 error if no user signed in tries to view list of users', async () => {
+    const res = await request(app).get('/api/v1/users');
+    expect(res.status).toBe(401);
+  });
+  it('should give a 403 error for unauthorized users viewing list of users', async () => {
+    await agent.post('/api/v1/users').send(testUser);
+    const res = await agent.get('/api/v1/users');
+    expect(res.status).toBe(403);
+  });
   it('should get list of users if user is admin', async () => {
     const adminUser = {
       firstName: 'Auth',
@@ -44,6 +53,7 @@ describe('backend-express-template routes', () => {
       password: 'Authorized',
     };
     await agent.post('/api/v1/users').send(adminUser);
+    await agent.post('/api/v1/users/sessions').send(adminUser);
     const res = await agent.get('/api/v1/users');
     expect(res.status).toBe(200);
     expect(res.body[0]).toEqual({
@@ -53,14 +63,16 @@ describe('backend-express-template routes', () => {
       email: expect.any(String),
     });
   });
-  it('should give a 401 error if no user signed in tries to view list of users', async () => {
-    const res = await request(app).get('/api/v1/users');
-    expect(res.status).toBe(401);
-  });
-  it('should give a 403 error for unauthorized users viewing list of users', async () => {
-    await agent.post('/api/v1/users').send(testUser);
-    const res = await agent.get('/api/v1/users');
-    expect(res.status).toBe(403);
+
+  it('should return a list of restaurants', async () => {
+    const res = await request(app).get('api/v1/restaurants');
+    expect(res.status).toBe(200);
+    expect(res.body[0]).toEqual({
+      id: expect.any(String),
+      name: expect.any(String),
+      cuisine: expect.any(String),
+      city: expect.any(String),
+    });
   });
   afterAll(() => {
     pool.end();
