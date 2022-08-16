@@ -8,6 +8,7 @@ const testUser = {
   email: 'testuser@email.com',
   password: 'password',
 };
+const agent = request.agent(app);
 
 describe('backend-express-template routes', () => {
   beforeEach(() => {
@@ -24,6 +25,15 @@ describe('backend-express-template routes', () => {
       lastName,
       email,
     });
+  });
+
+  it('should sign in a user', async () => {
+
+    await agent.post('/api/v1/users').send(testUser);
+    const res = await agent.post('/api/v1/users/sessions').send(testUser);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toEqual('Signed in successfully!');
   });
   afterAll(() => {
     pool.end();
