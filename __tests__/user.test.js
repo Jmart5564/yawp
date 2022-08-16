@@ -74,6 +74,18 @@ describe('backend-express-template routes', () => {
       city: expect.any(String),
     });
   });
+
+  it('should return a restaurant by id with details', async () => {
+    const res = await request(app).get('/api/v1/restaurants/1');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: '1',
+      name: 'Dizzy Hen',
+      cuisine: 'Brunch',
+      city: 'Philomath, OR',
+      reviews: expect.any(Array),
+    });
+  });
   afterAll(() => {
     pool.end();
   });
