@@ -94,7 +94,6 @@ describe('backend-express-template routes', () => {
         'If Every Pork Chop Were Perfect, We Wouldn/t Have Hot Dogs',
     };
     await agent.post('/api/v1/users').send(testUser);
-    await agent.post('/api/v1/users/sessions').send(testUser);
     const res = await agent.post('/api/v1/restaurants/2/reviews').send(review);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -104,9 +103,9 @@ describe('backend-express-template routes', () => {
       ...review,
     });
   });
-  it.skip('should delete a review based on user id', async () => {
+  it('should delete a review based on user id', async () => {
     const agent = request.agent(app);
-    await agent.post('/api/v1/users').send({ ...testUser, email: 'testuser@email.com' });
+    await agent.post('/api/v1/users').send(testUser);
 
     const res = await agent.delete('/api/v1/reviews/1');
     expect(res.status).toBe(200);
