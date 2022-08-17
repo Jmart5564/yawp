@@ -104,6 +104,13 @@ describe('backend-express-template routes', () => {
       ...review,
     });
   });
+  it.skip('should delete a review based on user id', async () => {
+    const agent = request.agent(app);
+    await agent.post('/api/v1/users').send({ ...testUser, email: 'testuser@email.com' });
+
+    const res = await agent.delete('/api/v1/reviews/1');
+    expect(res.status).toBe(200);
+  });
   afterAll(() => {
     pool.end();
   });
