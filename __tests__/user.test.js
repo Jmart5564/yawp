@@ -8,6 +8,12 @@ const testUser = {
   email: 'testuser@email.com',
   password: 'password',
 };
+const adminUser = {
+  firstName: 'Auth',
+  lastName: 'Official',
+  email: 'imanadmin@admin.com',
+  password: 'Authorized',
+};
 const agent = request.agent(app);
 
 describe('backend-express-template routes', () => {
@@ -46,12 +52,6 @@ describe('backend-express-template routes', () => {
     expect(res.status).toBe(403);
   });
   it('should get list of users if user is admin', async () => {
-    const adminUser = {
-      firstName: 'Auth',
-      lastName: 'Official',
-      email: 'imanadmin@admin.com',
-      password: 'Authorized',
-    };
     await agent.post('/api/v1/users').send(adminUser);
     await agent.post('/api/v1/users/sessions').send(adminUser);
     const res = await agent.get('/api/v1/users');
@@ -104,10 +104,17 @@ describe('backend-express-template routes', () => {
     });
   });
   it('should delete a review based on user id', async () => {
+    const review = {
+      stars: 3,
+      description:
+        'If Every Pork Chop Were Perfect, We Wouldn/t Have Hot Dogs',
+    };
     const agent = request.agent(app);
-    await agent.post('/api/v1/users').send(testUser);
-
-    const res = await agent.delete('/api/v1/reviews/1');
+    await agent.post('/api/v1/users').send(adminUser);
+    await agent.post('/api/v1/restaurants/2/reviews').send(review);
+    const reviews = await agent.get('/api/v1/restaurants/2');
+    console.log(reviews.body);
+    const res = await agent.delete('/api/v1/reviews/2');
     expect(res.status).toBe(200);
   });
   afterAll(() => {
